@@ -27,7 +27,8 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 DEBUG = True if os.environ.get("PROJECT_MODE", "") == "dev" else False
 
 ALLOWED_HOSTS = [
-    "localhost",
+    # "localhost",
+    "*",
 ]
 ALLOWED_HOSTS.extend(
     filter(

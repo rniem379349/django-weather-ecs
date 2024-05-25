@@ -1,15 +1,16 @@
 {
     "containerDefinitions": [
         {
-            "name": "weatherapp",
+            "name": "django-weatherapp",
             "image": "387352317739.dkr.ecr.us-east-1.amazonaws.com/django-weatherapp",
-            "cpu": 512,
-            "memory": 2048,
-            "memoryReservation": 1024,
+            "cpu": 256,
+            "memory": 1024,
+            "memoryReservation": 512,
             "portMappings": [
                 {
                     "name": "weatherapp-8080-tcp",
                     "containerPort": 8080,
+                    "hostPort": 8080,
                     "protocol": "tcp",
                     "appProtocol": "http"
                 }
@@ -37,7 +38,13 @@
                     "appProtocol": "http"
                 }
             ],
-            "essential": true
+            "essential": true,
+            "environment": [],
+            "environmentFiles": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "ulimits": [],
+            "systemControls": []
         }
     ],
     "family": "weatherapp-task-definition",
