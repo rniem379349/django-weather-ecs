@@ -1,0 +1,37 @@
+{% load static %}
+
+<h2>Location:</h2> <h3 class="forecast-data">{{ weather_data.latitude }}, {{ weather_data.longitude }}</h3>
+<div class="current-weather-card">
+    <h2>Current Weather:</h2>
+    <div class="current-weather-line">
+        <p>Temperature</p>
+        <h3 class="forecast-data">{{ weather_data.current.temperature_2m }} {{ weather_data.current_units.temperature_2m }}</h3>
+    </div>
+    <div class="current-weather-line-divider"></div>
+    <div class="current-weather-line">
+        <p>Precipitation</p>
+        <h3 class="forecast-data">{{ weather_data.current.precipitation }} {{ weather_data.current_units.precipitation }}</h3>
+    </div>
+    <div class="current-weather-line-divider"></div>
+    <div class="current-weather-line">
+        <p>Cloud cover</p>
+        <h3 class="forecast-data">{{ weather_data.current.cloud_cover }} {{ weather_data.current_units.cloud_cover }}</h3>
+    </div>
+</div>
+<h2>Hourly Forecast:</h2>
+<div class="hourly-weather-chart">
+    {% for time, temp, icon in hourly_forecast %}
+        {% if forloop.counter|divisibleby:3 %}
+            <div class="hourly-forecast-card">
+                <p class="weather-chart-day">{{ time|date:'d M' }}</p>
+                <p class="weather-chart-time">{{ time|time:'h A' }}</p>
+                <img src="{{ icon }}" class="weather-icon">
+                <p class="weather-chart-temp">{{ temp }} &#176;C</p>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+<h2>Advisory:</h2><p class="forecast-data">{{ forecast }}</p>
+<div class="img-holder">
+    <img src="{{ forecast_img }}" alt="" class="forecast-img" />
+</div>

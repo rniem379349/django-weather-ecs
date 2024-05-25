@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+  web:
+    build:
+      context: .
+      args:
+        - PROJECT_MODE
+    volumes:
+      - ./djangoweather:/app/
+      - static:/static
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SHELL=/bin/bash
+      - PROJECT_MODE
+      - DJANGO_SECRET_KEY
+      - ALLOWED_HOSTS
+      - DEBUG
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_HOST
+    ports:
+      - "8080:8080"
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+  nginx:
+    build:
+      context: ./docker/nginx
+    volumes:
+      - static:/static
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  static:

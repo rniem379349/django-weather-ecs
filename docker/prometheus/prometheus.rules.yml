@@ -1,0 +1,20 @@
+groups:
+- name: django-exceptions
+  rules:
+  # django 500 response rate by view method (5m)
+  - record: django_app_http_500_responses_by_view:rate5m
+    expr: sum by(view) (rate(django_http_responses_total_by_status_view_method_total{status="500"}[5m]))
+  # django views with more than 5% error (500) rates (5m)
+  - record: django_app_http_views_with_gt_5pc_err_rate:rate5m
+    expr: |
+      (
+        sum by(view) (rate(django_http_responses_total_by_status_view_method_total{status="500"}[5m]))
+        /
+        sum by(view) (rate(django_http_responses_total_by_status_view_method_total[5m]))
+      ) * 100 > 5
+  # HTTP request latency rate for each django view (excluding prometheus metric scraping)
+  - record: django_app_http_request_latency_by_view
+    expr: sum by(view) (rate(django_http_requests_latency_seconds_by_view_method_sum[5m]))
+  # HTTP request latency rate for each django view (excluding prometheus metric scraping) (bucketed by response time)
+  - record: django_app_http_request_latency_by_view_bucketed
+    expr: sum by(view, lt) (rate(django_http_requests_latency_seconds_by_view_method_bucket{view!="prometheus-django-metrics"}[5m]))
