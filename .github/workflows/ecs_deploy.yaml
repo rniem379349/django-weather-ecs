@@ -1,0 +1,80 @@
+name: Deploy to Amazon ECS
+
+on:
+  push:
+    branches: [ "master" ]
+
+env:
+  AWS_REGION: eu-east-1
+  ECR_DJANGO_REPOSITORY: django-weatherapp
+  ECR_NGINX_REPOSITORY: django-weatherapp-proxy
+  ECS_SERVICE: weatherapp-service
+  ECS_CLUSTER: WeatherappCluster
+  ECS_TASK_DEFINITION: ./deploy/ecs_task.json
+  DJANGO_CONTAINER_NAME: django-weather-app-ecs-web-1
+  NGINX_CONTAINER_NAME: django-weather-app-ecs-nginx-1
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1.7.0
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push images to Amazon ECR
+      id: build-images
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Build docker containers and
+        # push them to ECR so that they can
+        # be deployed to ECS.
+        docker buildx build -t $ECR_REGISTRY/$ECR_DJANGO_REPOSITORY:$IMAGE_TAG --build-arg PROJECT_MODE=dev .
+        docker buildx build -t $ECR_REGISTRY/$ECR_NGINX_REPOSITORY:$IMAGE_TAG docker/nginx
+        docker push $ECR_REGISTRY/$ECR_DJANGO_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_NGINX_REPOSITORY:$IMAGE_TAG
+        echo "django_image=$ECR_REGISTRY/$ECR_DJANGO_REPOSITORY:$IMAGE_TAG" >> $GITHUB_DJANGO_OUTPUT
+        echo "nginx_image=$ECR_REGISTRY/$ECR_NGINX_REPOSITORY:$IMAGE_TAG" >> $GITHUB_NGINX_OUTPUT
+
+    - name: Render Amazon ECS task definition for django container
+      id: render-django-container
+      uses: aws-actions/amazon-ecs-render-task-definition@v1.1.2
+      with:
+        task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        container-name: ${{ env.DJANGO_CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.django_image }}
+
+    - name: Modify Amazon ECS task definition with nginx container
+      id: render-nginx-container
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ steps.render-django-container.outputs.task-definition }}
+        container-name: ${{ env.NGINX_CONTAINER_NAME }}
+        image: ${{ steps.build-image.outputs.nginx_image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
