@@ -24,7 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True if os.environ.get("PROJECT_MODE", "") == "dev" else False
+# DEBUG = True if os.environ.get("PROJECT_MODE", "") == "dev" else False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     # "localhost",
@@ -176,7 +177,7 @@ AWS_S3_SIGNATURE_NAME = ("s3v4",)
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 AWS_S3_VERITY = True
-# DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
