@@ -1,4 +1,4 @@
-name: Deploy to Amazon ECS
+name: Build and deploy images to Amazon ECR
 
 on:
   push:
@@ -8,10 +8,6 @@ env:
   AWS_REGION: us-east-1
   ECR_DJANGO_REPOSITORY: django-weatherapp
   ECR_NGINX_REPOSITORY: django-weatherapp-proxy
-  ECS_SERVICE: weatherapp-service
-  ECS_CLUSTER: WeatherappCluster
-  ECS_TASK_DEFINITION: ./deploy/ecs_task.json
-  DJANGO_CONTAINER_NAME: django-weatherapp
 
 defaults:
   run:
@@ -51,20 +47,3 @@ jobs:
         docker buildx build -t $ECR_REGISTRY/$ECR_NGINX_REPOSITORY:$IMAGE_TAG docker/nginx
         docker push $ECR_REGISTRY/$ECR_DJANGO_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_NGINX_REPOSITORY:$IMAGE_TAG
-        echo "django_image=$ECR_REGISTRY/$ECR_DJANGO_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-    # - name: Render Amazon ECS task definition for django container
-    #   id: render-django-container
-    #   uses: aws-actions/amazon-ecs-render-task-definition@v1.3.0
-    #   with:
-    #     task-definition: ${{ env.ECS_TASK_DEFINITION }}
-    #     container-name: ${{ env.DJANGO_CONTAINER_NAME }}
-    #     image: ${{ steps.build-images.outputs.django_image }}
-
-    # - name: Deploy Amazon ECS task definition
-    #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1.5.0
-    #   with:
-    #     task-definition: ${{ steps.render-django-container.outputs.task-definition }}
-    #     service: ${{ env.ECS_SERVICE }}
-    #     cluster: ${{ env.ECS_CLUSTER }}
-    #     wait-for-service-stability: true
