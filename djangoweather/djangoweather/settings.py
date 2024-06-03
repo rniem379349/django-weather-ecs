@@ -24,8 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True if os.environ.get("PROJECT_MODE", "") == "dev" else False
-DEBUG = True
+DEBUG = True if os.environ.get("PROJECT_MODE", "") == "dev" else False
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -57,7 +56,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django_prometheus",
     "weather",
-    # "boto3",
     "storages"
 ]
 

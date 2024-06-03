@@ -20,11 +20,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from django.urls.conf import include
+from weather.views import WeatherRedirectView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("weather/", include(("weather.urls", "weather"), namespace="weather")),
-    path("", include("django_prometheus.urls")),
+    path("", WeatherRedirectView.as_view(), name="weather-redirect"),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

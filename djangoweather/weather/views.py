@@ -3,12 +3,16 @@ from datetime import datetime
 
 import requests
 from django.templatetags.static import static
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 
 WEATHER_API_URL = "https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,is_day,precipitation,cloud_cover&hourly=temperature_2m,precipitation_probability,precipitation,cloud_cover&forecast_days=3"  # noqa: E501
 
 
-# Create your views here.
+class WeatherRedirectView(RedirectView):
+    permanent = True
+    pattern_name = "weather:index"
+
+
 class WeatherView(TemplateView):
     template_name = "weather/home.html"
     site_title = "Explore the wevva!"
