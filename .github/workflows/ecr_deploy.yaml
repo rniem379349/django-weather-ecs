@@ -14,7 +14,7 @@ defaults:
     shell: bash
 
 jobs:
-  deploy:
+  ecr_deploy:
     name: Deploy
     runs-on: ubuntu-latest
     environment: development

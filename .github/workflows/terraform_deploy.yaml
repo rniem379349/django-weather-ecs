@@ -1,0 +1,64 @@
+name: Deploy Terraform production infrastructure
+
+on:
+  workflow_run:
+    workflows: [ "Build and deploy images to Amazon ECR" ]
+    branches: [ "master" ]
+    types:
+      - completed
+  workflow_dispatch:
+    branches: [ "master" ]
+
+env:
+  AWS_REGION: us-east-1
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  terraform_deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    environment: development
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+          terraform_version: 1.8.0
+    - name: Terraform init and validate
+      working-directory: deploy/terraform
+      run: |
+        terraform init
+
+    - name: Terraform plan
+      working-directory: deploy/terraform
+      run: |
+        terraform plan
+    
+    - name: Create terraform deployment issue
+      uses: trstringer/manual-approval@v1
+      with:
+        secret: ${{ github.TOKEN }}
+        approvers: rniem379349
+        minimum-approvals: 1
+        issue-title: "New Terraform deployment"
+        issue-body: "Review the terraform plan, then approve or deny deployment."
+        exclude-workflow-initiator-as-approver: false
+    
+    - name: Terraform apply
+      working-directory: deploy/terraform
+      run: |
+        terraform apply -auto-approve
