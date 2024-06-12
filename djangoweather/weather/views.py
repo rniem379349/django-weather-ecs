@@ -90,19 +90,15 @@ class WeatherDataView(TemplateView):
     def generate_forecast(self, weather_data):
         temp = weather_data["current"]["temperature_2m"]
         forecast_map = {
-            "supercold": """Oh boy, how are you still alive?
-                Shouldn't you be frozen like Elsa? My recommendation - GET OUT""",
+            "supercold": """Oh boy, how are you still alive? Get inside quick, and have a cup of hot tea.""",
             "freezing": """Could be worse, but it's still freezing out there.
                 May I suggest a nice sauna?""",
-            "cold": """Not really freezing, but still kind of cold -
-                so wear a nice beanie, a trendy scarf and some dang ol' mittens man""",
+            "cold": """Not really freezing, but still kind of cold - get your sweaters and jackets ready.""",
             "warm": """Pretty warm! Some would say this is the sweet spot -
                 you can walk outside with a t-shirt
                 and not get sweaty just walking around. Enjoy!""",
-            "hot": """It's warming up, like in a sauna - but it's outside!
-                Stay hydrated.""",
-            "superhot": """Man, just staying in the shadow makes you sweat -
-                consider moving underground, like a lizard(?)""",
+            "hot": """It's starting to get hot - stay hydrated and seek out some shade.""",
+            "superhot": """Just staying in the shade makes you sweat - be careful not to get a heat stroke!""",
             "deadlyhot": """\N{melting face} \N{melting face} \N{melting face}
                 RUN. \N{melting face} \N{melting face} \N{melting face}""",
             "no_idea": "I have no idea...",
@@ -125,16 +121,16 @@ class WeatherDataView(TemplateView):
             case temp if -20 <= temp < 0:
                 chosen_forecast = forecast_map["freezing"]
                 forecast_img = forecast_img_map["freezing"]
-            case temp if 0 <= temp < 10:
+            case temp if 0 <= temp < 15:
                 chosen_forecast = forecast_map["cold"]
                 forecast_img = forecast_img_map["cold"]
-            case temp if 10 <= temp < 25:
+            case temp if 15 <= temp < 25:
                 chosen_forecast = forecast_map["warm"]
                 forecast_img = forecast_img_map["warm"]
-            case temp if 20 <= temp < 30:
+            case temp if 25 <= temp < 35:
                 chosen_forecast = forecast_map["hot"]
                 forecast_img = forecast_img_map["hot"]
-            case temp if 30 <= temp < 40:
+            case temp if 35 <= temp < 40:
                 chosen_forecast = forecast_map["superhot"]
                 forecast_img = forecast_img_map["superhot"]
             case temp if temp >= 40:
