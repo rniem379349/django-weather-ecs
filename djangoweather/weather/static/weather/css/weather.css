@@ -91,6 +91,13 @@ body {
 }
 
 /* Google map */
+.map {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 65vh;
+}
+
 .map-button-background {
     border: 2px solid #fff;
     border-radius: 3px;

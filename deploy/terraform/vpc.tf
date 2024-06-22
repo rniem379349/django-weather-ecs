@@ -61,6 +61,14 @@ resource "aws_security_group" "weatherapp_lb_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "TCP"
+    self        = "false"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -81,10 +89,27 @@ resource "aws_lb" "weatherapp_lb" {
   }
 }
 
+# Redirect http traffic to alb to https
 resource "aws_lb_listener" "weatherapp_lb_listener" {
   load_balancer_arn = aws_lb.weatherapp_lb.arn
   port              = 80
   protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+resource "aws_lb_listener" "weatherapp_lb_https_listener" {
+  load_balancer_arn = aws_lb.weatherapp_lb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  certificate_arn   = aws_acm_certificate.weatherapp_certificate_request.arn
 
   default_action {
     type             = "forward"

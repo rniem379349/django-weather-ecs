@@ -135,7 +135,7 @@ function displayWeatherData(dataHTML) {
 async function initMap(weatherDataContainer, loadingScreen, weatherDataSpinner) {
   const { Map } = await google.maps.importLibrary("maps");
   const mapOptions = {
-    center: { lat: 50.0630014, lng: 19.9369794 },
+    center: { lat: 53.9120011, lng: 16.2325182 },
     clickableIcons: false,
     fullscreenControl: false,
     mapTypeControl: false,

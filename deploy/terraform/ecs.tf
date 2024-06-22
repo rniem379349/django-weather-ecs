@@ -72,7 +72,7 @@ resource "aws_ecs_task_definition" "weatherapp_task" {
         },
         {
           name  = "ALLOWED_HOSTS",
-          value = aws_lb.weatherapp_lb.dns_name
+          value = "${aws_lb.weatherapp_lb.dns_name},${var.domain_name}"
         },
         {
           name  = "AWS_STORAGE_BUCKET_NAME",
